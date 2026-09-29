@@ -106,6 +106,14 @@ blockquote{margin:6px 0 0;padding:12px 16px;background:var(--quote-bg);border-le
 .page-ellipsis{color:var(--muted);padding:0 2px;font-size:12px;}
 .page-info{font-size:12px;color:var(--muted);margin-left:6px;}
 
+/* 导入确认弹窗 */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:10002;align-items:center;justify-content:center;padding:20px;}
+.modal.active{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px 28px;max-width:560px;width:100%;box-shadow:0 10px 50px rgba(0,0,0,.6);}
+.modal-box h3{margin:0 0 12px;font-size:16px;color:var(--text);}
+.modal-box p{margin:0 0 20px;font-size:14px;color:var(--text);line-height:1.9;}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap;}
+
 /* 灯箱 */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;overflow:auto;}
 .lightbox.active{display:block;}
@@ -127,10 +135,10 @@ blockquote{margin:6px 0 0;padding:12px 16px;background:var(--quote-bg);border-le
 <body>
 <div class="container">
   <h1>B站评论收藏 · 管理</h1>
-  <p class="subtitle">所有修改立即写入浏览器。可以关联一个本地 HTML 文件，之后每次修改自动同步到那里。</p>
+  <p class="subtitle">所有修改立即写入浏览器。<b>「关联已有文件」会先读取文件内容、再问你怎么处理，不会直接覆盖；两个「另存为」只是一次性导出，不会建立关联。</b></p>
 
   <div class="file-bar">
-    <button class="btn" id="btn-link-file">🔗 关联本地 HTML 文件</button>
+    <button class="btn" id="btn-link-file">📂 关联已有文件</button>
     <button class="btn btn-secondary" id="btn-resume-permission" style="display:none">🔑 恢复写入权限</button>
     <button class="btn btn-secondary" id="btn-unlink" style="display:none">✂️ 取消关联</button>
     <span class="file-status" id="file-status">未关联任何本地文件</span>
@@ -138,8 +146,8 @@ blockquote{margin:6px 0 0;padding:12px 16px;background:var(--quote-bg);border-le
 
   <div class="toolbar">
     <input type="text" id="search-box" class="search-box" placeholder="🔍 搜索评论内容、作者、视频标题、点评...">
-    <button class="btn btn-secondary" id="btn-export-html">📥 另存为副本</button>
-    <button class="btn btn-secondary" id="btn-export-md">📄 导出 Markdown</button>
+    <button class="btn btn-secondary" id="btn-save-html">💾 另存为 HTML</button>
+    <button class="btn btn-secondary" id="btn-save-md">📄 另存为 Markdown</button>
   </div>
   <p class="stats">共 <span id="stats-total">0</span> 条，当前显示 <span id="stats-visible">0</span> 条</p>
   <div id="list"></div>
@@ -153,6 +161,18 @@ blockquote{margin:6px 0 0;padding:12px 16px;background:var(--quote-bg);border-le
     <img id="lightbox-img" src="" alt="">
   </div>
   <span class="loading-hint" id="loading-hint">正在加载原图…</span>
+</div>
+
+<div class="modal" id="import-modal">
+  <div class="modal-box">
+    <h3>这个文件里已经有收藏</h3>
+    <p id="import-modal-text"></p>
+    <div class="modal-actions">
+      <button class="btn" id="import-merge">合并（推荐）</button>
+      <button class="btn btn-secondary" id="import-replace">用文件里的替换</button>
+      <button class="btn btn-secondary" id="import-cancel">取消</button>
+    </div>
+  </div>
 </div>
 
 <script src="manage.js"></script>

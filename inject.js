@@ -1,4 +1,4 @@
-// inject.js —— v1.1 · 注入页面主世界，读取评论接口的精确时间与楼层关系
+// inject.js —— v1.2 · 注入页面主世界，读取评论接口的精确时间与楼层关系
 (function() {
     'use strict';
 
@@ -108,5 +108,5 @@
         return origSend.apply(this, arguments);
     };
 
-    console.log('%c[B站评论收藏] inject.js v1.1 已注入', 'color:#00aeec;');
+    console.log('%c[B站评论收藏] inject.js v1.2 已注入', 'color:#00aeec;');
 })();

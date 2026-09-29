@@ -1,4 +1,4 @@
-// content.js —— v1.1 · 在 B 站视频页注入收藏按钮，采集评论数据
+// content.js —— v1.2 · 在 B 站视频页注入收藏按钮，采集评论数据
 (function() {
     'use strict';
     const STORAGE_KEY = 'bili_saved_comments';
@@ -688,5 +688,5 @@
         startScan();
     }
 
-    console.log('%c[B站评论收藏] v1.1 已启动', 'color:#1aad5b;font-weight:bold;');
+    console.log('%c[B站评论收藏] v1.2 已启动', 'color:#1aad5b;font-weight:bold;');
 })();

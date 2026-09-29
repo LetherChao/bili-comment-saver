@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "B站评论收藏夹",
-  "version": "1.1",
+  "version": "1.2",
   "description": "一键收藏B站精辟评论，保存发言人、时间、内容、回复及视频信息。",
   "permissions": [
     "storage"
