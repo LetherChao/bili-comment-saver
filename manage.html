@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>B站评论收藏 · 管理</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#18191c;
+  --card:#212226;
+  --text:#e3e5e7;
+  --muted:#9499a0;
+  --primary:#00aeec;
+  --border:#2f3134;
+  --quote-bg:#2b2d31;
+  --note-bg:#3a2d10;
+  --note-border:#f5a623;
+}
+*{box-sizing:border-box;}
+body{margin:0;padding:24px;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;}
+.container{max-width:920px;margin:0 auto;}
+h1{font-size:22px;margin:0 0 4px;color:#e3e5e7;}
+.subtitle{font-size:13px;color:var(--muted);margin:0 0 20px;}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+.search-box{flex:1;min-width:200px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--card);color:var(--text);outline:none;font-family:inherit;}
+.search-box:focus{border-color:var(--primary);}
+.search-box::placeholder{color:#5c6169;}
+.btn{padding:9px 16px;border:none;border-radius:8px;background:var(--primary);color:#fff;cursor:pointer;font-size:14px;font-family:inherit;white-space:nowrap;}
+.btn:hover{background:#0098d1;}
+.btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--quote-bg);color:var(--text);}
+.file-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);padding:10px 14px;border-radius:8px;border:1px solid var(--border);margin-bottom:12px;}
+.file-status{flex:1;font-size:13px;color:var(--muted);min-width:120px;}
+.file-status.linked{color:#4ec97e;}
+.file-status.need-permission{color:#e0a050;}
+.file-status.error{color:#f56c6c;}
+.stats{font-size:13px;color:var(--muted);margin:0 0 24px;}
+.stats span{color:var(--primary);font-weight:600;}
+.empty{text-align:center;color:var(--muted);padding:60px 0;font-size:14px;}
+.comment{background:var(--card);border-radius:12px;padding:24px 28px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.3);border:1px solid var(--border);}
+.card-header{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:8px;}
+.video-title{font-size:15px;font-weight:600;color:var(--primary);text-decoration:none;}
+.video-title:hover{text-decoration:underline;}
+.meta{font-size:12px;color:var(--muted);}
+.type-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;}
+.type-comment{background:#1a3a4a;color:#6ec8f0;}
+.type-full{background:#1f3a1a;color:#8ed070;}
+.type-reply{background:#4a3520;color:#f0b060;}
+.delete-btn{margin-left:auto;padding:4px 12px;border:1px solid var(--border);border-radius:6px;background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-family:inherit;}
+.delete-btn:hover{background:#f56c6c;color:#fff;border-color:#f56c6c;}
+.section-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:20px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.context{padding:12px 16px;background:var(--quote-bg);border-radius:8px;font-size:14px;}
+.context-author{color:var(--primary);font-weight:600;}
+.context-quote{margin:8px 0 0;padding:0;border:none;background:transparent;color:var(--muted);font-style:italic;font-size:13px;}
+.author-block{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.author-block-sm{gap:8px;}
+.avatar-link{flex-shrink:0;display:block;width:40px;height:40px;border-radius:50%;overflow:hidden;border:1px solid var(--border);background:var(--quote-bg);text-decoration:none;transition:.15s;}
+.avatar-link-sm{width:30px;height:30px;}
+.avatar-link:hover{border-color:var(--primary);transform:scale(1.06);}
+.avatar{width:100%;height:100%;object-fit:cover;display:block;}
+.avatar-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--muted);background:var(--quote-bg);}
+.author-info{flex:1;min-width:0;}
+.author-name{font-weight:600;font-size:15px;color:var(--text);text-decoration:none;margin-right:10px;}
+.author-name:hover{color:var(--primary);}
+.jump-link{font-size:13px;margin-right:8px;text-decoration:none;color:var(--muted);transition:color .15s;opacity:.7;}
+.jump-link:hover{color:var(--primary);opacity:1;}
+.time{font-size:13px;color:var(--muted);margin-right:10px;}
+.like-badge{font-size:12px;color:#f5909e;background:#3a1f28;padding:1px 8px;border-radius:10px;font-weight:500;}
+blockquote{margin:6px 0 0;padding:12px 16px;background:var(--quote-bg);border-left:3px solid var(--primary);border-radius:6px;white-space:pre-wrap;word-break:break-word;font-size:15px;}
+.images{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.images img{max-width:200px;max-height:200px;border-radius:8px;border:1px solid var(--border);background:#fff;cursor:zoom-in;transition:.15s;}
+.images img:hover{transform:scale(1.03);}
+.reply{margin-top:14px;padding:14px 18px;background:var(--quote-bg);border-radius:8px;border-left:2px solid var(--border);}
+.reply blockquote{background:transparent;border-left:none;padding:4px 0 0;}
+.note-section{margin-top:14px;}
+.reply .note-section{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);}
+.note-display{background:var(--note-bg);border-left:3px solid var(--note-border);padding:12px 16px;border-radius:6px;}
+.note-label{font-weight:600;font-size:13px;color:#f5a623;margin-right:6px;}
+.note-content{font-size:14px;white-space:pre-wrap;margin-top:4px;}
+.note-actions{margin-top:8px;display:flex;gap:8px;}
+.note-actions button{font-size:12px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;}
+.note-actions button:hover{background:var(--quote-bg);color:var(--text);}
+.note-add-btn{padding:5px 12px;font-size:12px;border:1px dashed var(--border);background:transparent;color:var(--muted);border-radius:6px;cursor:pointer;font-family:inherit;}
+.note-add-btn:hover{border-color:var(--primary);color:var(--primary);}
+.note-editor{margin-top:8px;}
+.note-input{width:100%;min-height:70px;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:inherit;resize:vertical;background:var(--bg);color:var(--text);box-sizing:border-box;}
+.note-input:focus{outline:none;border-color:var(--primary);}
+.note-editor-actions{margin-top:8px;display:flex;gap:8px;}
+.note-save-btn{padding:5px 14px;background:var(--primary);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;}
+.note-save-btn:hover{background:#0098d1;}
+.note-cancel-btn{padding:5px 14px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:13px;font-family:inherit;}
+.note-cancel-btn:hover{background:var(--quote-bg);color:var(--text);}
+
+.reply-toggle-wrap{margin-top:16px;}
+.reply-toggle-btn{padding:6px 14px;font-size:13px;background:transparent;color:var(--primary);border:1px solid var(--primary);border-radius:6px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:.15s;}
+.reply-toggle-btn:hover{background:var(--quote-bg);}
+.reply-toggle-btn .arrow{font-size:10px;transition:transform .2s;display:inline-block;}
+.reply-toggle-btn.open .arrow{transform:rotate(180deg);}
+.replies-container{display:none;margin-top:8px;}
+.replies-container.open{display:block;}
+.pagination{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;align-items:center;margin-top:14px;padding-top:12px;border-top:1px dashed var(--border);}
+.page-btn{padding:3px 10px;font-size:12px;background:transparent;color:var(--muted);border:1px solid var(--border);border-radius:4px;cursor:pointer;font-family:inherit;min-width:28px;text-align:center;}
+.page-btn:hover:not(:disabled):not(.active){border-color:var(--primary);color:var(--primary);}
+.page-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.page-btn:disabled{opacity:.4;cursor:not-allowed;}
+.page-ellipsis{color:var(--muted);padding:0 2px;font-size:12px;}
+.page-info{font-size:12px;color:var(--muted);margin-left:6px;}
+
+/* 灯箱 */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:9999;overflow:auto;}
+.lightbox.active{display:block;}
+.lightbox-stage{min-height:100%;display:flex;align-items:center;justify-content:center;padding:40px;box-sizing:border-box;}
+.lightbox-stage.long-image{align-items:flex-start;}
+.lightbox img{display:block;border-radius:4px;background:#fff;box-shadow:0 8px 60px rgba(0,0,0,.6);user-select:none;-webkit-user-drag:none;cursor:zoom-out;}
+.lightbox-stage.long-image img{cursor:grab;}
+.lightbox-stage.long-image img:active{cursor:grabbing;}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:80px;background:rgba(0,0,0,.45);color:#fff;border:none;cursor:pointer;font-size:32px;line-height:1;z-index:10000;transition:background .15s;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;padding:0;}
+.lb-nav:hover{background:rgba(0,0,0,.75);}
+.lb-prev{left:16px;border-radius:6px;}
+.lb-next{right:16px;border-radius:6px;}
+.lb-nav:disabled{opacity:.15;cursor:not-allowed;}
+.lb-counter{position:fixed;top:16px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;opacity:.85;background:rgba(0,0,0,.55);padding:4px 14px;border-radius:12px;z-index:10001;letter-spacing:1px;}
+.lb-counter:empty{display:none;}
+.lightbox .loading-hint{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;opacity:.6;display:none;z-index:10001;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>B站评论收藏 · 管理</h1>
+  <p class="subtitle">所有修改立即写入浏览器。可以关联一个本地 HTML 文件，之后每次修改自动同步到那里。</p>
+
+  <div class="file-bar">
+    <button class="btn" id="btn-link-file">🔗 关联本地 HTML 文件</button>
+    <button class="btn btn-secondary" id="btn-resume-permission" style="display:none">🔑 恢复写入权限</button>
+    <button class="btn btn-secondary" id="btn-unlink" style="display:none">✂️ 取消关联</button>
+    <span class="file-status" id="file-status">未关联任何本地文件</span>
+  </div>
+
+  <div class="toolbar">
+    <input type="text" id="search-box" class="search-box" placeholder="🔍 搜索评论内容、作者、视频标题、点评...">
+    <button class="btn btn-secondary" id="btn-export-html">📥 另存为副本</button>
+    <button class="btn btn-secondary" id="btn-export-md">📄 导出 Markdown</button>
+  </div>
+  <p class="stats">共 <span id="stats-total">0</span> 条，当前显示 <span id="stats-visible">0</span> 条</p>
+  <div id="list"></div>
+</div>
+
+<div class="lightbox" id="lightbox">
+  <button class="lb-nav lb-prev" id="lb-prev" title="上一张">‹</button>
+  <button class="lb-nav lb-next" id="lb-next" title="下一张">›</button>
+  <span class="lb-counter" id="lb-counter"></span>
+  <div class="lightbox-stage" id="lightbox-stage">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <span class="loading-hint" id="loading-hint">正在加载原图…</span>
+</div>
+
+<script src="manage.js"></script>
+</body>
+</html>
